@@ -1,0 +1,48 @@
+def timeCT '{
+	local waitSecs
+        if (($# != 1) & ($# != 2)){
+                print "Usage: timeCT <scan_name> [<first_dist>]"
+                exit   
+        }
+	waitSecs = ($# > 1) ? $2 : 600
+        _timeCT("$1", waitSecs, 0)
+
+}'
+
+def timeCT360 '{
+	local waitSecs
+        if (($# != 1) & ($# != 2)){
+                p "Usage: timeCT360 <scan_name> [<first_dist>]"
+                exit   
+        }
+	waitSecs = ($# > 1) ? $2 : 600
+        _timeCT("$1", waitSecs, 1)
+}'
+
+def _timeCT(scan_base, waitSecs, is360) '{
+  local i ii scan_name
+  for (i = 0; i <= 1000; i++) {
+    #p date("%m-%d-%Y_%T.%.6")
+    scan_name=sprintf("%s_%s_",date("%dth_%Hh%Mm%S"),scan_base);
+    p scan_name
+    #shopen
+    _fasttomo(scan_name, 0, 0, is360)
+    #shclose
+    # either:
+    #printf("\nSleeping %d secs, if you want to stop, press CTRL-C now!\n",waitSecs)
+    #sleep(waitSecs)
+    # or:
+    for (ii=waitSecs;ii>0;ii--) {
+       printf("...sleeping %d secs, if you want to stop, press CTRL-C now!          \r",ii)
+       if ( ii%20 ==0 ) {
+         printf("... touching %s \r.    ",FTOMO_PAR["data_dir"])
+         unix(sprintf("touch %s",FTOMO_PAR["data_dir"]))
+       }
+       sleep(1)
+    }
+  }
+}'
+
+
+
+
